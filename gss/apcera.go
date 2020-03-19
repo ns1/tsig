@@ -9,9 +9,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bodgit/tsig"
 	multierror "github.com/hashicorp/go-multierror"
 	"github.com/miekg/dns"
+	"github.com/ns1/tsig"
 	"github.com/openshift/gssapi"
 )
 

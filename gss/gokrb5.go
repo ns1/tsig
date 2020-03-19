@@ -11,18 +11,18 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bodgit/tsig"
-	"github.com/jcmturner/gokrb5/v8/client"
-	"github.com/jcmturner/gokrb5/v8/config"
-	"github.com/jcmturner/gokrb5/v8/credentials"
-	"github.com/jcmturner/gokrb5/v8/crypto"
-	"github.com/jcmturner/gokrb5/v8/gssapi"
-	"github.com/jcmturner/gokrb5/v8/iana/keyusage"
-	"github.com/jcmturner/gokrb5/v8/keytab"
-	"github.com/jcmturner/gokrb5/v8/messages"
-	"github.com/jcmturner/gokrb5/v8/spnego"
-	"github.com/jcmturner/gokrb5/v8/types"
 	"github.com/miekg/dns"
+	"github.com/ns1/gokrb5/v8/client"
+	"github.com/ns1/gokrb5/v8/config"
+	"github.com/ns1/gokrb5/v8/credentials"
+	"github.com/ns1/gokrb5/v8/crypto"
+	"github.com/ns1/gokrb5/v8/gssapi"
+	"github.com/ns1/gokrb5/v8/iana/keyusage"
+	"github.com/ns1/gokrb5/v8/keytab"
+	"github.com/ns1/gokrb5/v8/messages"
+	"github.com/ns1/gokrb5/v8/spnego"
+	"github.com/ns1/gokrb5/v8/types"
+	"github.com/ns1/tsig"
 )
 
 type context struct {
@@ -300,6 +300,19 @@ func (c *GSS) NegotiateContextWithCredentials(host, domain, username, password s
 
 	err = cl.Login()
 	if err != nil {
+		return nil, nil, err
+	}
+
+	return c.negotiateContext(host, cl)
+}
+
+// NegotiateContextWithClient exchanges RFC 2930 TKEY records with the
+// indicated DNS server to establish a security context using the provided
+// client.
+// It returns the negotiated TKEY name, expiration time, and any error that
+// occurred.
+func (c *GSS) NegotiateContextWithClient(host string, cl *client.Client) (*string, *time.Time, error) {
+	if err := cl.Login(); err != nil {
 		return nil, nil, err
 	}
 

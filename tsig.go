@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	c "github.com/bodgit/tsig/client"
 	"github.com/miekg/dns"
+	c "github.com/ns1/tsig/client"
 )
 
 const (
