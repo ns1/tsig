@@ -11,18 +11,18 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bodgit/tsig"
 	"github.com/miekg/dns"
-	"gopkg.in/jcmturner/gokrb5.v7/client"
-	"gopkg.in/jcmturner/gokrb5.v7/config"
-	"gopkg.in/jcmturner/gokrb5.v7/credentials"
-	"gopkg.in/jcmturner/gokrb5.v7/crypto"
-	"gopkg.in/jcmturner/gokrb5.v7/gssapi"
-	"gopkg.in/jcmturner/gokrb5.v7/iana/keyusage"
-	"gopkg.in/jcmturner/gokrb5.v7/keytab"
-	"gopkg.in/jcmturner/gokrb5.v7/messages"
-	"gopkg.in/jcmturner/gokrb5.v7/spnego"
-	"gopkg.in/jcmturner/gokrb5.v7/types"
+	"github.com/ns1/gokrb5/v8/client"
+	"github.com/ns1/gokrb5/v8/config"
+	"github.com/ns1/gokrb5/v8/credentials"
+	"github.com/ns1/gokrb5/v8/crypto"
+	"github.com/ns1/gokrb5/v8/gssapi"
+	"github.com/ns1/gokrb5/v8/iana/keyusage"
+	"github.com/ns1/gokrb5/v8/keytab"
+	"github.com/ns1/gokrb5/v8/messages"
+	"github.com/ns1/gokrb5/v8/spnego"
+	"github.com/ns1/gokrb5/v8/types"
+	"github.com/ns1/tsig"
 )
 
 type context struct {
@@ -274,7 +274,7 @@ func (c *GSS) NegotiateContext(host string) (*string, *time.Time, error) {
 		return nil, nil, err
 	}
 
-	cl, err := client.NewClientFromCCache(cache, cfg, client.DisablePAFXFAST(true))
+	cl, err := client.NewFromCCache(cache, cfg, client.DisablePAFXFAST(true))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -296,10 +296,23 @@ func (c *GSS) NegotiateContextWithCredentials(host, domain, username, password s
 		return nil, nil, err
 	}
 
-	cl := client.NewClientWithPassword(username, domain, password, cfg, client.DisablePAFXFAST(true))
+	cl := client.NewWithPassword(username, domain, password, cfg, client.DisablePAFXFAST(true))
 
 	err = cl.Login()
 	if err != nil {
+		return nil, nil, err
+	}
+
+	return c.negotiateContext(host, cl)
+}
+
+// NegotiateContextWithClient exchanges RFC 2930 TKEY records with the
+// indicated DNS server to establish a security context using the provided
+// client.
+// It returns the negotiated TKEY name, expiration time, and any error that
+// occurred.
+func (c *GSS) NegotiateContextWithClient(host string, cl *client.Client) (*string, *time.Time, error) {
+	if err := cl.Login(); err != nil {
 		return nil, nil, err
 	}
 
@@ -325,7 +338,7 @@ func (c *GSS) NegotiateContextWithKeytab(host, domain, username, path string) (*
 		return nil, nil, err
 	}
 
-	cl := client.NewClientWithKeytab(username, domain, kt, cfg, client.DisablePAFXFAST(true))
+	cl := client.NewWithKeytab(username, domain, kt, cfg, client.DisablePAFXFAST(true))
 
 	err = cl.Login()
 	if err != nil {

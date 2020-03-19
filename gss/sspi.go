@@ -11,9 +11,9 @@ import (
 
 	"github.com/alexbrainman/sspi"
 	"github.com/alexbrainman/sspi/negotiate"
-	"github.com/bodgit/tsig"
 	multierror "github.com/hashicorp/go-multierror"
 	"github.com/miekg/dns"
+	"github.com/ns1/tsig"
 )
 
 // GSS maps the TKEY name to the context that negotiated it as

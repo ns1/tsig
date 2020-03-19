@@ -77,10 +77,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bodgit/tsig"
 	"github.com/enceve/crypto/dh"
 	multierror "github.com/hashicorp/go-multierror"
 	"github.com/miekg/dns"
+	"github.com/ns1/tsig"
 )
 
 const (
