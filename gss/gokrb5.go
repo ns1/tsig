@@ -147,7 +147,7 @@ func (c *GSS) negotiateContext(host string, cl *client.Client) (*string, *time.T
 		return nil, nil, err
 	}
 
-	apreq, err := spnego.NewKRB5TokenAPREQ(cl, tkt, key, []int{gssapi.ContextFlagInteg}, []int{gssapi.ContextFlagMutual})
+	apreq, err := spnego.NewKRB5TokenAPREQ(cl, tkt, key, []int{gssapi.ContextFlagInteg, gssapi.ContextFlagMutual}, []int{gssapi.ContextFlagMutual})
 	if err != nil {
 		return nil, nil, err
 	}
